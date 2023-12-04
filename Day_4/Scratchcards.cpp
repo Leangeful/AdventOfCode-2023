@@ -24,7 +24,7 @@ void solve() {
   vector<int> allWins;
   string line = "";
   while (getline(inputFile, line)) {
-    set<int> winningNumbers;
+    set<string> winningNumbers;
 
     stringstream ss(line);
     string item;
@@ -35,12 +35,16 @@ void solve() {
 
     while (ss >> item) {
       if (item == "|") break;
-      winningNumbers.insert(stoi(item));
+      winningNumbers.insert(item);
     }
 
     while (ss >> item)
-      if (winningNumbers.find(stoi(item)) != winningNumbers.end()) wins++;
+      if (winningNumbers.find(item) != winningNumbers.end()) {
+        wins++;
+      }
+
     allWins.push_back(wins);
+
     if (wins) result_1 += pow(2, wins - 1);
   }
 
