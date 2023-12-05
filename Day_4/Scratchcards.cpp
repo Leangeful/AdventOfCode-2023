@@ -8,11 +8,13 @@
 #include <set>
 #include <numeric>
 
+#define ull unsigned long long int
+
 using namespace std;
 
 void solve() {
-  unsigned long long int result_1 = 0;
-  unsigned long long int result_2 = 0;
+  ull result_1 = 0;
+  ull result_2 = 0;
 
   ifstream inputFile("./input");
 
@@ -65,6 +67,6 @@ void solve() {
 }
 
 int main() {
-  cout << "Advent of Code 2023" << endl << "Day 4" << endl;
+  cout << "Advent of Code 2023" << endl << "Day 5" << endl;
   solve();  // 23678 15455663
 }
