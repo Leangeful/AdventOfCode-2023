@@ -8,10 +8,12 @@
 #include <set>
 #include <numeric>
 #include <algorithm>
+#include <chrono>
 
 #define ull unsigned long long int
 
 using namespace std;
+using namespace std::chrono;
 
 struct Entry {
   ull destination, source, range;
@@ -77,17 +79,37 @@ void solve() {
 
   vector<ull> locations;
 
-  for (ull seed : seeds) {
-    locations.push_back(getDestination(seed, almanac));
-  }
+  for (ull seed : seeds) locations.push_back(getDestination(seed, almanac));
 
   result_1 = *min_element(locations.begin(), locations.end());
 
-    cout << result_1 << endl;
+  for (int i = 0; i < seeds.size() - 1; i += 2) {
+    for (int k = seeds[i]; k < seeds[i + 1]; k++) {
+      ull location = getDestination(k, almanac);
+      if (location < result_2) {
+        result_2 = location;
+      }
+    }
+  }
+
+  cout << result_1 << endl;
   cout << result_2 << endl;
 }
 
 int main() {
   cout << "Advent of Code 2023" << endl << "Day 5" << endl;
-  solve();  // 340994526
+
+  auto start = high_resolution_clock::now();
+  solve();  // 340994526 52210644
+            //            7 min 47 s 41 ms 166 μs
+
+  auto stop = high_resolution_clock::now();
+
+  const auto mins = duration_cast<minutes>(stop - start);
+  const auto secs = duration_cast<seconds>(stop - start - mins);
+  const auto ms = duration_cast<milliseconds>(stop - start - mins - secs);
+  const auto mis = duration_cast<microseconds>(stop - start - mins - secs - ms);
+
+  cout << "Execution time: " << mins.count() << " min " << secs.count() << " s "
+       << ms.count() << " ms " << mis.count() << " μs" << endl;
 }
