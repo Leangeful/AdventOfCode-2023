@@ -15,14 +15,23 @@
 using namespace std;
 using namespace std::chrono;
 
-struct Entry {
-  ull destination, source, range;
+struct Range {
+  ull start, end;
 };
 
-ull getDestination(ull source, vector<vector<Entry>>& almanac) {
-  ull destination = source;
+struct Entry {
+  Range destination, source;
+};
 
-  for (vector<Entry>& category : almanac) {
+void sortCategory(vector<Entry>& category) {
+  sort(category.begin(), category.end(),
+       [](Entry a, Entry b) { return a.source.start < b.source.start; });
+}
+
+ull getDestination(Range sourceRange, vector<vector<Entry>>& almanac) {
+  ull destination = 0;
+
+  /* for (vector<Entry>& category : almanac) {
     source = destination;
     for (Entry& entry : category) {
       if (source >= entry.source && source < entry.source + entry.range) {
@@ -30,7 +39,7 @@ ull getDestination(ull source, vector<vector<Entry>>& almanac) {
         break;
       }
     }
-  }
+  } */
 
   return destination;
 }
@@ -47,50 +56,62 @@ void solve() {
   }
 
   vector<ull> seeds;
+  vector<Range> seedRanges;
   vector<vector<Entry>> almanac;
+
   string line = "";
   getline(inputFile, line);
 
   stringstream ss(line);
-  string item;
-  ss >> item;
 
-  while (ss >> item) {
-    seeds.push_back(stoull(item));
+  string seed1, seed2;
+  ss >> seed1;
+
+  while (ss >> seed1 >> seed2) {
+    seeds.push_back(stoull(seed1));
+    seeds.push_back(stoull(seed2));
+    seedRanges.push_back({stoull(seed1), stoull(seed1) + stoull(seed2) - 1});
   }
 
   while (getline(inputFile, line)) {
     if (line.size()) {
       if (line[line.size() - 1] == ':') {
+        if (almanac.size()) sortCategory(almanac[almanac.size() - 1]);
         almanac.push_back(vector<Entry>());
       } else {
         stringstream ss(line);
 
-        string dest, src, rng;
+        string destStr, srcStr, rngStr;
 
-        ss >> dest >> src >> rng;
+        ss >> destStr >> srcStr >> rngStr;
 
-        Entry entry = {stoull(dest), stoull(src), stoull(rng)};
+        ull dest = stoull(destStr), src = stoull(srcStr),
+            rng = stoull(rngStr) - 1;
+
+        Entry entry = {{dest, dest + rng}, {src, src + rng}};
 
         almanac[almanac.size() - 1].push_back(entry);
       }
     }
   }
 
+  sortCategory(almanac[almanac.size() - 1]);
+
   vector<ull> locations;
 
-  for (ull seed : seeds) locations.push_back(getDestination(seed, almanac));
+  for (ull seed : seeds)
+    locations.push_back(getDestination({seed, seed}, almanac));
 
   result_1 = *min_element(locations.begin(), locations.end());
 
-  for (int i = 0; i < seeds.size() - 1; i += 2) {
+  /* for (int i = 0; i < seeds.size() - 1; i += 2) {
     for (int k = seeds[i]; k < seeds[i + 1]; k++) {
       ull location = getDestination(k, almanac);
       if (location < result_2) {
         result_2 = location;
       }
     }
-  }
+  } */
 
   cout << result_1 << endl;
   cout << result_2 << endl;
@@ -101,7 +122,7 @@ int main() {
 
   auto start = high_resolution_clock::now();
   solve();  // 340994526 52210644
-            //            7 min 47 s 41 ms 166 μs
+            //           naive: 7 min 47 s 41 ms 166 μs
 
   auto stop = high_resolution_clock::now();
 
